@@ -1,24 +1,29 @@
-import React from 'react';
-import Sidebar from './components/Sidebar';
-import ViewTabs from './components/ViewTabs';
-import CalendarView from './components/CalendarView';
-import ScheduleTableView from './components/ScheduleTableView';
-import ShiftModal from './components/ShiftModal';
-import './App.css';
+// src/App.jsx
+import React from 'react'
+import { Routes, Route } from 'react-router-dom'
+import Sidebar from './components/Sidebar'
+import EmployeesPage from './pages/EmployeesPage'
+import ShiftTypesPage from './pages/ShiftTypesPage'
+import VacationsPage  from './pages/VacationsPage'
+import CalendarView    from './components/CalendarView'
+import ScheduleTableView from './components/ScheduleTableView'
 
-function App() {
+export default function App() {
   return (
     <div className="flex h-screen">
       <Sidebar />
-      <div className="flex-1 p-4">
-        <ViewTabs />
-        {/* Здесь можно переключаться между видами */}
-        <CalendarView />
-        <ScheduleTableView />
-        <ShiftModal />
+      <div className="flex-1 p-4 overflow-auto">
+        <Routes>
+          <Route path="/" element={
+            <>
+              <ScheduleTableView/>
+            </>
+          }/>
+          <Route path="/employees" element={<EmployeesPage />} />
+          <Route path="/shift-types" element={<ShiftTypesPage />} />
+          <Route path="/vacations" element={<VacationsPage />} />
+        </Routes>
       </div>
     </div>
-  );
+  )
 }
-
-export default App;

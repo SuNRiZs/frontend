@@ -1,12 +1,12 @@
 // src/components/ViewTabs.jsx
-import React from 'react';
+import React from 'react'
 
 export default function ViewTabs({ current, onChange }) {
   const tabs = [
-    { key: 'day',   label: 'День' },
-    { key: 'week',  label: 'Неделя' },
+    { key: 'day', label: 'День' },
+    { key: 'week', label: 'Неделя' },
     { key: 'month', label: 'Месяц' },
-  ];
+  ]
 
   return (
     <div className="flex space-x-2">
@@ -25,5 +25,5 @@ export default function ViewTabs({ current, onChange }) {
         </button>
       ))}
     </div>
-  );
+  )
 }

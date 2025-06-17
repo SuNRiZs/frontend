@@ -1,5 +1,5 @@
 import React, { useContext, useState, useCallback } from 'react';
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { DepartmentContext } from '../contexts/DepartmentContext';
 import ScheduleView from '../components/schedule/ScheduleView';
 import { apiClient } from '../api/client';
@@ -13,11 +13,17 @@ import {
   endOfWeek,
 } from 'date-fns';
 import { ru } from 'date-fns/locale';
+import { GenerationSettingsDialog } from '../components/schedule/GenerationSettingsDialog';
 
 export default function SchedulePage() {
   const { current: deptId, departments, setCurrent } = useContext(DepartmentContext);
   const [view, setView] = useState('month'); // 'month' или 'week'
   const [baseDate, setBaseDate] = useState(new Date());
+  const [settingsOpen, setSettingsOpen] = useState(false);
+  const [genSettings, setGenSettings] = useState({
+    skip_vacations: true,
+    treat_birthdays_as_off: true,
+  });
 
   // Навигация назад
   const goPrev = useCallback(() => {
@@ -57,6 +63,8 @@ export default function SchedulePage() {
         .then(r => r.data),
     enabled: !!deptId,
   });
+
+  const queryClient = useQueryClient();
 
   if (loadingShifts || loadingEmployees || loadingTypes) {
     return <div className="p-4">Loading…</div>;
@@ -106,6 +114,12 @@ export default function SchedulePage() {
                 )}`}
           </span>
           <button onClick={goNext} className="px-2">›</button>
+          <button
+            onClick={() => setSettingsOpen(true)}
+            className="ml-4 px-3 py-1 border rounded"
+          >
+            Генерация…
+          </button>
         </div>
       </div>
 
@@ -119,6 +133,20 @@ export default function SchedulePage() {
           baseDate={baseDate}
         />
       </div>
+      <GenerationSettingsDialog
+        open={settingsOpen}
+        settings={genSettings}
+        onClose={() => setSettingsOpen(false)}
+        onSubmit={async s => {
+          setSettingsOpen(false);
+          setGenSettings(s);
+          await apiClient.post('/api/roster/generate/', {
+            month: format(baseDate, 'yyyy-MM-01'),
+            ...s,
+          });
+          queryClient.invalidateQueries(['shifts', deptId]);
+        }}
+      />
     </div>
   );
 }
